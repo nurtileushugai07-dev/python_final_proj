@@ -99,7 +99,7 @@ class QuizManager:
                     text           = q["text"],
                     correct_answer = q["correct_answer"]
                 )
-            else:  # default: multiple_choice
+            else:
                 obj = MultipleChoiceQuestion(
                     question_id    = q["id"],
                     text           = q["text"],
@@ -216,7 +216,6 @@ def quiz(quiz_id):
 
 @app.route("/result", methods=["GET", "POST"])
 def result():
-
     quiz_id      = session.get("quiz_id")
     user_answers = session.get("user_answers", {})
 
@@ -233,6 +232,7 @@ def result():
     username = flat_answers.pop("username", "Anonymous")
     score_data = manager.calculate_score(quiz_data, flat_answers)
 
+    # Persist to CSV
     save_result_to_csv(
         username   = username,
         quiz_id    = quiz_id,
@@ -242,6 +242,7 @@ def result():
         percentage = score_data["percentage"]
     )
 
+    # Clear session after use
     session.pop("user_answers", None)
     session.pop("quiz_id", None)
 
@@ -252,14 +253,19 @@ def result():
         score_data = score_data
     )
 
-
 @app.route("/dashboard")
 def dashboard():
     all_results = load_results_from_csv()
-    # Sort newest first
-    all_results = list(reversed(all_results))
-    return render_template("dashboard.html", results=all_results)
 
+    leaderboard = sorted(
+        all_results,
+        key=lambda r: (int(r.get("percentage", 0)), int(r.get("score", 0))),
+        reverse=True
+    )[:5]
+
+    history = list(reversed(all_results))
+
+    return render_template("dashboard.html", results=history, leaderboard=leaderboard)
 
 if __name__ == "__main__":
     app.run(debug=True)

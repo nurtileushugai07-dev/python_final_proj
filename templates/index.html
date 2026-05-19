@@ -1,140 +1,101 @@
 {% extends "base.html" %}
-
 {% block title %}Home — Quiz Platform{% endblock %}
 
 {% block extra_head %}
 <style>
-  .hero {
-    text-align: center;
-    padding: 2.5rem 0 2rem;
-  }
-  .hero h1 {
-    font-size: 2.6rem;
-    line-height: 1.2;
-    margin-bottom: .75rem;
-  }
-  .hero h1 em {
-    font-style: normal;
-    color: var(--accent);
-  }
-  .hero p {
-    color: var(--muted);
-    font-size: 1.05rem;
-    max-width: 480px;
-    margin: 0 auto 1.5rem;
-  }
-  .stats-row {
-    display: flex;
-    justify-content: center;
-    gap: 2rem;
-    margin-bottom: 2.5rem;
-    flex-wrap: wrap;
-  }
-  .stat { text-align: center; }
-  .stat-num {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.8rem;
-    color: var(--accent);
-  }
-  .stat-label { font-size: .8rem; color: var(--muted); margin-top: .1rem; }
-
-  .section-title {
-    font-size: 1.2rem;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: .1em;
-    font-size: .8rem;
-    margin-bottom: 1rem;
-  }
-  .quiz-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 1.25rem;
-  }
-  .quiz-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: .85rem;
-    transition: border-color .2s, transform .2s;
-    animation: fadeUp .4s ease both;
-  }
-  .quiz-card:hover {
-    border-color: var(--accent);
-    transform: translateY(-3px);
-  }
-  .quiz-card:nth-child(2) { animation-delay: .08s; }
-  .quiz-card:nth-child(3) { animation-delay: .16s; }
-
-  .quiz-icon { font-size: 2.2rem; }
-  .quiz-card h3 { font-size: 1.15rem; }
-  .quiz-card p  { color: var(--muted); font-size: .9rem; flex: 1; }
-  .quiz-meta {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .quiz-count { font-size: .82rem; color: var(--muted); }
-
-  .empty {
-    text-align: center;
-    color: var(--muted);
-    padding: 3rem;
-  }
+  .hero { text-align:center; padding:2.5rem 0 2rem; }
+  .hero h1 { font-size:2.6rem; line-height:1.2; margin-bottom:.75rem; }
+  .hero h1 em { font-style:normal; color:var(--accent); }
+  .hero p { color:var(--muted); font-size:1.05rem; max-width:480px; margin:0 auto 1.5rem; }
+  .stats-row { display:flex; justify-content:center; gap:2rem; margin-bottom:2.5rem; flex-wrap:wrap; }
+  .stat { text-align:center; }
+  .stat-num { font-family:'DM Serif Display',serif; font-size:1.8rem; color:var(--accent); }
+  .stat-label { font-size:.8rem; color:var(--muted); margin-top:.1rem; }
+  .filter-bar { display:flex; gap:.5rem; flex-wrap:wrap; margin-bottom:1.25rem; align-items:center; }
+  .filter-btn { padding:.38rem .9rem; border-radius:999px; border:1px solid var(--border); background:transparent; color:var(--muted); font-size:.82rem; font-weight:600; cursor:pointer; transition:all .18s; font-family:'DM Sans',sans-serif; }
+  .filter-btn:hover { border-color:var(--accent); color:var(--text); }
+  .filter-btn.active { background:var(--accent); border-color:var(--accent); color:#fff; }
+  .category-group { margin-bottom:2rem; }
+  .category-heading { font-size:.78rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:var(--accent); margin-bottom:.9rem; }
+  .quiz-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:1.25rem; }
+  .quiz-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.5rem; display:flex; flex-direction:column; gap:.85rem; transition:border-color .2s,transform .2s; animation:fadeUp .4s ease both; }
+  .quiz-card:hover { border-color:var(--accent); transform:translateY(-3px); }
+  .quiz-icon { font-size:2.2rem; }
+  .quiz-card h3 { font-size:1.15rem; }
+  .quiz-card p { color:var(--muted); font-size:.9rem; flex:1; }
+  .quiz-meta { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.5rem; }
+  .quiz-count { font-size:.82rem; color:var(--muted); }
+  .cat-tag { font-size:.72rem; font-weight:600; padding:.15rem .55rem; border-radius:999px; background:rgba(108,99,255,.15); color:var(--accent); }
+  .empty { text-align:center; color:var(--muted); padding:3rem; }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- Hero -->
 <div class="hero fade-up">
   <h1>Test Your <em>Knowledge</em>,<br>Track Your Progress</h1>
   <p>Choose a quiz below, answer the questions, and see how you score.</p>
   <a href="{{ url_for('dashboard') }}" class="btn btn-outline">📊 View Leaderboard</a>
 </div>
 
-<!-- Stats row -->
+{# BUG FIX: one counter only, using namespace #}
+{% set ns = namespace(total=0) %}
+{% for q in quizzes %}{% set ns.total = ns.total + q.questions|length %}{% endfor %}
+
 <div class="stats-row">
   <div class="stat">
     <div class="stat-num">{{ quizzes | length }}</div>
     <div class="stat-label">Available Quizzes</div>
   </div>
   <div class="stat">
-    <div class="stat-num">
-      {{ quizzes | map(attribute='questions') | map('length') | sum }}
-      {# simpler: count total questions #}
-      {% set ns = namespace(total=0) %}
-      {% for q in quizzes %}{% set ns.total = ns.total + q.questions|length %}{% endfor %}
-      {{ ns.total }}
-    </div>
+    <div class="stat-num">{{ ns.total }}</div>
     <div class="stat-label">Total Questions</div>
   </div>
 </div>
 
-<!-- Quiz cards -->
-<p class="section-title">Available Quizzes</p>
-
 {% if quizzes %}
-  <div class="quiz-grid">
-    {% for quiz in quizzes %}
-    <div class="quiz-card">
-      <div class="quiz-icon">{{ quiz.icon }}</div>
-      <h3>{{ quiz.title }}</h3>
-      <p>{{ quiz.description }}</p>
-      <div class="quiz-meta">
-        <span class="quiz-count">{{ quiz.questions | length }} questions</span>
-        <a href="{{ url_for('quiz', quiz_id=quiz.id) }}" class="btn btn-primary">
-          Start →
-        </a>
+  {% set categories = [] %}
+  {% for q in quizzes %}{% if q.category not in categories %}{% set _ = categories.append(q.category) %}{% endif %}{% endfor %}
+
+  <div class="filter-bar" id="filterBar">
+    <button class="filter-btn active" data-cat="all">All</button>
+    {% for cat in categories %}<button class="filter-btn" data-cat="{{ cat }}">{{ cat }}</button>{% endfor %}
+  </div>
+
+  {% for cat in categories %}
+  <div class="category-group" data-group="{{ cat }}">
+    <div class="category-heading">📂 {{ cat }}</div>
+    <div class="quiz-grid">
+      {% for quiz in quizzes if quiz.category == cat %}
+      <div class="quiz-card" style="animation-delay:{{ loop.index * 0.07 }}s">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div class="quiz-icon">{{ quiz.icon }}</div>
+          <span class="cat-tag">{{ quiz.category }}</span>
+        </div>
+        <h3>{{ quiz.title }}</h3>
+        <p>{{ quiz.description }}</p>
+        <div class="quiz-meta">
+          <span class="quiz-count">⏱ {{ quiz.timer_minutes }} min &nbsp;·&nbsp; {{ quiz.questions|length }} q</span>
+          <a href="{{ url_for('quiz', quiz_id=quiz.id) }}" class="btn btn-primary">Start →</a>
+        </div>
       </div>
+      {% endfor %}
     </div>
-    {% endfor %}
   </div>
+  {% endfor %}
+
+  <script>
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const cat = btn.dataset.cat;
+        document.querySelectorAll('.category-group').forEach(g => {
+          g.style.display = (cat === 'all' || g.dataset.group === cat) ? '' : 'none';
+        });
+      });
+    });
+  </script>
 {% else %}
-  <div class="empty card">
-    <p>⚠️ No quizzes found. Make sure <code>data/questions.json</code> exists.</p>
-  </div>
+  <div class="empty card"><p>⚠️ No quizzes found.</p></div>
 {% endif %}
 {% endblock %}
