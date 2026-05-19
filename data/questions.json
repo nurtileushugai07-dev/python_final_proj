@@ -1,0 +1,132 @@
+{
+  "quizzes": [
+    {
+      "id": "python_basics",
+      "title": "Python Basics",
+      "description": "Test your knowledge of Python fundamentals",
+      "icon": "🐍",
+      "questions": [
+        {
+          "id": 1,
+          "type": "multiple_choice",
+          "text": "What is   the correct way to create a list in Python?",
+          "options": ["(1, 2, 3)", "[1, 2, 3]", "{1, 2, 3}", "<1, 2, 3>"],
+          "correct_answer": "[1, 2, 3]"
+        },
+        {
+          "id": 2,
+          "type": "true_false",
+          "text": "Python is a statically typed programming language.",
+          "correct_answer": "False"
+        },
+        {
+          "id": 3,
+          "type": "multiple_choice",
+          "text": "Which keyword is used to define a function in Python?",
+          "options": ["function", "def", "fun", "define"],
+          "correct_answer": "def"
+        },
+        {
+          "id": 4,
+          "type": "true_false",
+          "text": "In Python, indentation is used to define code blocks.",
+          "correct_answer": "True"
+        },
+        {
+          "id": 5,
+          "type": "multiple_choice",
+          "text": "What does len([1, 2, 3, 4]) return?",
+          "options": ["3", "4", "5", "Error"],
+          "correct_answer": "4"
+        }
+      ]
+    },
+    {
+      "id": "web_dev",
+      "title": "Web Development",
+      "description": "HTML, CSS and HTTP fundamentals quiz",
+      "icon": "🌐",
+      "questions": [
+        {
+          "id": 1,
+          "type": "multiple_choice",
+          "text": "What does HTML stand for?",
+          "options": [
+            "HyperText Markup Language",
+            "HighText Machine Language",
+            "HyperText and links Markup Language",
+            "None of the above"
+          ],
+          "correct_answer": "HyperText Markup Language"
+        },
+        {
+          "id": 2,
+          "type": "true_false",
+          "text": "CSS stands for Cascading Style Sheets.",
+          "correct_answer": "True"
+        },
+        {
+          "id": 3,
+          "type": "multiple_choice",
+          "text": "Which HTTP status code means 'Not Found'?",
+          "options": ["200", "301", "404", "500"],
+          "correct_answer": "404"
+        },
+        {
+          "id": 4,
+          "type": "true_false",
+          "text": "Flask is a full-stack framework like Django.",
+          "correct_answer": "False"
+        },
+        {
+          "id": 5,
+          "type": "multiple_choice",
+          "text": "Which tag is used for the largest heading in HTML?",
+          "options": ["<h6>", "<heading>", "<h1>", "<head>"],
+          "correct_answer": "<h1>"
+        }
+      ]
+    },
+    {
+      "id": "data_structures",
+      "title": "Data Structures",
+      "description": "Algorithms and data structures concepts",
+      "icon": "🏗️",
+      "questions": [
+        {
+          "id": 1,
+          "type": "multiple_choice",
+          "text": "Which data structure uses LIFO (Last In, First Out)?",
+          "options": ["Queue", "Stack", "Array", "Linked List"],
+          "correct_answer": "Stack"
+        },
+        {
+          "id": 2,
+          "type": "true_false",
+          "text": "A binary tree can have at most 2 children per node.",
+          "correct_answer": "True"
+        },
+        {
+          "id": 3,
+          "type": "multiple_choice",
+          "text": "What is the time complexity of accessing an element in an array by index?",
+          "options": ["O(n)", "O(log n)", "O(1)", "O(n²)"],
+          "correct_answer": "O(1)"
+        },
+        {
+          "id": 4,
+          "type": "true_false",
+          "text": "A Queue uses FIFO (First In, First Out) ordering.",
+          "correct_answer": "True"
+        },
+        {
+          "id": 5,
+          "type": "multiple_choice",
+          "text": "Which sorting algorithm has average time complexity O(n log n)?",
+          "options": ["Bubble Sort", "Insertion Sort", "Merge Sort", "Selection Sort"],
+          "correct_answer": "Merge Sort"
+        }
+      ]
+    }
+  ]
+}

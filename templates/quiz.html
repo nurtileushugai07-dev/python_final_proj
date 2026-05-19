@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+
+{% block title %}{{ quiz.title }} — Quiz Platform{% endblock %}
+
+{% block extra_head %}
+<style>
+  .quiz-header {
+    margin-bottom: 2rem;
+    animation: fadeUp .35s ease both;
+  }
+  .quiz-header .back-link {
+    font-size: .85rem;
+    color: var(--muted);
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+    margin-bottom: 1rem;
+  }
+  .quiz-header h1 { font-size: 2rem; margin-bottom: .4rem; }
+  .quiz-header p  { color: var(--muted); }
+
+  /* Username field */
+  .name-card {
+    background: linear-gradient(135deg, rgba(108,99,255,.15), rgba(108,99,255,.05));
+    border: 1px solid rgba(108,99,255,.35);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.75rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    animation: fadeUp .35s ease .05s both;
+  }
+  .name-card label { font-weight: 600; white-space: nowrap; }
+  .name-card input {
+    flex: 1;
+    min-width: 180px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: .55rem .9rem;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: .95rem;
+    outline: none;
+    transition: border-color .2s;
+  }
+  .name-card input:focus { border-color: var(--accent); }
+
+  /* Question cards */
+  .question-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 1.1rem;
+    transition: border-color .2s;
+    animation: fadeUp .4s ease both;
+  }
+  .question-card:hover { border-color: rgba(108,99,255,.4); }
+
+  .q-number {
+    font-size: .78rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    margin-bottom: .6rem;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+  }
+  .q-text { font-size: 1.05rem; margin-bottom: 1.1rem; font-weight: 500; }
+
+  /* Options */
+  .options-list { display: flex; flex-direction: column; gap: .55rem; }
+  .option-label {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: .65rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background .15s, border-color .15s;
+    font-size: .95rem;
+  }
+  .option-label:hover {
+    background: rgba(108,99,255,.1);
+    border-color: var(--accent);
+  }
+  .option-label input[type="radio"] { accent-color: var(--accent); }
+
+  /* True/False buttons */
+  .tf-row { display: flex; gap: .75rem; }
+  .tf-label {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+    padding: .7rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    font-weight: 600;
+    font-size: .95rem;
+    transition: background .15s, border-color .15s;
+  }
+  .tf-label:hover { border-color: var(--accent); background: rgba(108,99,255,.1); }
+  .tf-label input { display: none; }
+  .tf-label.true-btn  { color: var(--green); }
+  .tf-label.false-btn { color: var(--red); }
+
+  /* Submit bar */
+  .submit-bar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .submit-bar p { color: var(--muted); font-size: .9rem; }
+
+  /* Progress indicator */
+  .progress-dots {
+    display: flex;
+    gap: .4rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    animation: fadeUp .35s ease .1s both;
+  }
+  .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--border);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<form method="POST" action="{{ url_for('quiz', quiz_id=quiz.id) }}">
+
+  <!-- Header -->
+  <div class="quiz-header">
+    <a href="{{ url_for('index') }}" class="back-link">← Back to quizzes</a>
+    <h1>{{ quiz.icon }} {{ quiz.title }}</h1>
+    <p>{{ quiz.description }} &nbsp;·&nbsp; {{ questions | length }} questions</p>
+  </div>
+
+  <!-- Progress dots -->
+  <div class="progress-dots">
+    {% for q in questions %}
+      <div class="dot"></div>
+    {% endfor %}
+  </div>
+
+  <!-- Username -->
+  <div class="name-card">
+    <label for="username">👤 Your name:</label>
+    <input type="text" id="username" name="username"
+           placeholder="Enter your name…" required maxlength="50" />
+  </div>
+
+  <!-- Questions -->
+  {% for q in questions %}
+  <div class="question-card" style="animation-delay: {{ loop.index * 0.06 }}s">
+    <div class="q-number">
+      Question {{ loop.index }} of {{ questions | length }}
+      {% if q.get_type() == 'True / False' %}
+        <span class="badge badge-tf">T / F</span>
+      {% else %}
+        <span class="badge badge-mc">Multiple Choice</span>
+      {% endif %}
+    </div>
+
+    <p class="q-text">{{ q.text }}</p>
+
+    {% if q.get_type() == 'True / False' %}
+      <!-- True / False -->
+      <div class="tf-row">
+        <label class="tf-label true-btn">
+          <input type="radio" name="q_{{ q.id }}" value="True" required />
+          ✅ True
+        </label>
+        <label class="tf-label false-btn">
+          <input type="radio" name="q_{{ q.id }}" value="False" />
+          ❌ False
+        </label>
+      </div>
+
+    {% else %}
+      <!-- Multiple Choice -->
+      <div class="options-list">
+        {% for option in q.options %}
+        <label class="option-label">
+          <input type="radio" name="q_{{ q.id }}" value="{{ option }}" required />
+          {{ option }}
+        </label>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+  {% endfor %}
+
+  <!-- Submit -->
+  <div class="submit-bar">
+    <p>Make sure you've answered all {{ questions | length }} questions.</p>
+    <button type="submit" class="btn btn-primary">Submit Answers →</button>
+  </div>
+
+</form>
+{% endblock %}

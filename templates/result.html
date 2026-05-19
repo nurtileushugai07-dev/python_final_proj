@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+
+{% block title %}Results — {{ quiz.title }}{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* Score hero */
+  .result-hero {
+    text-align: center;
+    padding: 2rem 0 2.5rem;
+    animation: fadeUp .4s ease both;
+  }
+  .score-ring {
+    position: relative;
+    width: 130px; height: 130px;
+    margin: 0 auto 1.25rem;
+  }
+  .score-ring svg { transform: rotate(-90deg); }
+  .score-ring circle {
+    fill: none;
+    stroke-width: 10;
+    stroke-linecap: round;
+  }
+  .ring-bg    { stroke: var(--border); }
+  .ring-fill  { stroke: var(--accent); transition: stroke-dashoffset 1s ease; }
+  .ring-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .ring-pct {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.8rem;
+    line-height: 1;
+    color: var(--text);
+  }
+  .ring-grade {
+    font-size: .85rem;
+    color: var(--muted);
+    margin-top: .1rem;
+  }
+
+  .result-hero h1 { font-size: 2rem; margin-bottom: .4rem; }
+  .result-hero .sub { color: var(--muted); font-size: 1rem; }
+
+  .stat-cards {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: .85rem 1.4rem;
+    text-align: center;
+    min-width: 100px;
+  }
+  .stat-card .num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.6rem;
+  }
+  .stat-card .lbl { font-size: .78rem; color: var(--muted); margin-top: .1rem; }
+  .correct .num { color: var(--green); }
+  .wrong   .num { color: var(--red); }
+  .pct     .num { color: var(--accent); }
+
+  /* Answer review */
+  .review-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 2.5rem 0 1rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    font-size: .8rem;
+  }
+  .answer-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: .85rem;
+    display: grid;
+    grid-template-columns: 28px 1fr;
+    gap: .5rem 1rem;
+    align-items: start;
+    animation: fadeUp .4s ease both;
+  }
+  .answer-card.correct { border-color: rgba(67,217,162,.35); }
+  .answer-card.wrong   { border-color: rgba(255,107,107,.35); }
+
+  .answer-icon { font-size: 1.2rem; padding-top: .15rem; }
+  .answer-body {}
+  .answer-q {
+    font-weight: 500;
+    margin-bottom: .5rem;
+  }
+  .answer-row {
+    font-size: .88rem;
+    color: var(--muted);
+    display: flex;
+    gap: .5rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .ans-label { font-size: .78rem; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+  .ans-user    { color: var(--text); }
+  .ans-correct { color: var(--green); }
+  .ans-wrong   { color: var(--red); text-decoration: line-through; }
+
+  /* Actions */
+  .actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Score hero -->
+<div class="result-hero fade-up">
+  {% set r = 55 %}
+  {% set circumference = (2 * 3.14159 * r) | round(2) %}
+  {% set offset = (circumference * (1 - score_data.percentage / 100)) | round(2) %}
+
+  <div class="score-ring">
+    <svg viewBox="0 0 130 130" width="130" height="130">
+      <circle class="ring-bg"   cx="65" cy="65" r="{{ r }}" />
+      <circle class="ring-fill" cx="65" cy="65" r="{{ r }}"
+              stroke-dasharray="{{ circumference }}"
+              stroke-dashoffset="{{ offset }}" />
+    </svg>
+    <div class="ring-text">
+      <div class="ring-pct">{{ score_data.percentage }}%</div>
+      <div class="ring-grade">Grade {{ score_data.grade }}</div>
+    </div>
+  </div>
+
+  <h1>
+    {% if score_data.percentage >= 70 %}🎉 Well done{% else %}📚 Keep practising{% endif %},
+    {{ username }}!
+  </h1>
+  <p class="sub">
+    You scored <strong>{{ score_data.score }}</strong> out of
+    <strong>{{ score_data.total }}</strong> on <em>{{ quiz.title }}</em>.
+    &nbsp;
+    <span class="badge {% if score_data.percentage >= 60 %}badge-pass{% else %}badge-fail{% endif %}">
+      {% if score_data.percentage >= 60 %}PASS{% else %}FAIL{% endif %}
+    </span>
+  </p>
+
+  <div class="stat-cards">
+    <div class="stat-card correct">
+      <div class="num">{{ score_data.score }}</div>
+      <div class="lbl">Correct</div>
+    </div>
+    <div class="stat-card wrong">
+      <div class="num">{{ score_data.total - score_data.score }}</div>
+      <div class="lbl">Wrong</div>
+    </div>
+    <div class="stat-card pct">
+      <div class="num">{{ score_data.percentage }}%</div>
+      <div class="lbl">Score</div>
+    </div>
+  </div>
+</div>
+
+<!-- Answer review -->
+<p class="review-title">Answer Review</p>
+
+{% for item in score_data.results %}
+<div class="answer-card {{ 'correct' if item.is_correct else 'wrong' }}"
+     style="animation-delay: {{ loop.index * 0.05 }}s">
+  <div class="answer-icon">
+    {% if item.is_correct %}✅{% else %}❌{% endif %}
+  </div>
+  <div class="answer-body">
+    <p class="answer-q">{{ loop.index }}. {{ item.text }}</p>
+    <div class="answer-row">
+      <span class="ans-label">Your answer:</span>
+      <span class="{{ 'ans-correct' if item.is_correct else 'ans-wrong' }}">
+        {{ item.user_answer }}
+      </span>
+      {% if not item.is_correct %}
+        <span class="ans-label" style="margin-left:.5rem">Correct:</span>
+        <span class="ans-correct">{{ item.correct_answer }}</span>
+      {% endif %}
+      <span class="badge {{ 'badge-mc' if item.type == 'Multiple Choice' else 'badge-tf' }}"
+            style="margin-left: auto;">
+        {{ item.type }}
+      </span>
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+<!-- Actions -->
+<div class="actions">
+  <a href="{{ url_for('quiz', quiz_id=quiz.id) }}" class="btn btn-outline">🔄 Retry Quiz</a>
+  <a href="{{ url_for('index') }}"                 class="btn btn-primary">🏠 All Quizzes</a>
+  <a href="{{ url_for('dashboard') }}"             class="btn btn-outline">📊 Dashboard</a>
+</div>
+
+{% endblock %}

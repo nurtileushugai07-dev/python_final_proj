@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Quiz Not Found{% endblock %}
+{% block content %}
+<div style="text-align:center; padding: 4rem 2rem; animation: fadeUp .4s ease both;">
+  <div style="font-size:4rem; margin-bottom:1rem;">🔍</div>
+  <h1 style="font-size:2rem; margin-bottom:.5rem;">Quiz Not Found</h1>
+  <p style="color:var(--muted); margin-bottom:1.5rem;">
+    The quiz you're looking for doesn't exist or was removed.
+  </p>
+  <a href="{{ url_for('index') }}" class="btn btn-primary">← Back to Home</a>
+</div>
+{% endblock %}
+

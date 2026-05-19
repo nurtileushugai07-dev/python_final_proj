@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard — Quiz Platform{% endblock %}
+
+{% block extra_head %}
+<style>
+  .dash-header {
+    margin-bottom: 2rem;
+    animation: fadeUp .35s ease both;
+  }
+  .dash-header h1 { font-size: 2rem; margin-bottom: .35rem; }
+  .dash-header p  { color: var(--muted); }
+
+  /* Summary cards */
+  .summary-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+    animation: fadeUp .35s ease .05s both;
+  }
+  .sum-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.1rem;
+    text-align: center;
+  }
+  .sum-card .num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.7rem;
+    color: var(--accent);
+  }
+  .sum-card .lbl { font-size: .78rem; color: var(--muted); margin-top: .1rem; }
+
+  /* Table */
+  .table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    animation: fadeUp .4s ease .1s both;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .92rem;
+  }
+  thead tr {
+    background: rgba(108,99,255,.12);
+    border-bottom: 1px solid var(--border);
+  }
+  th {
+    text-align: left;
+    padding: .85rem 1.1rem;
+    font-size: .75rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  td {
+    padding: .8rem 1.1rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: rgba(255,255,255,.02); }
+
+  .pct-cell { font-weight: 600; }
+  .pct-high { color: var(--green); }
+  .pct-mid  { color: var(--yellow); }
+  .pct-low  { color: var(--red); }
+
+  .prog-bar-wrap {
+    background: var(--border);
+    border-radius: 999px;
+    height: 5px;
+    width: 80px;
+    overflow: hidden;
+    margin-top: .3rem;
+  }
+  .prog-bar { height: 100%; border-radius: 999px; background: var(--accent); }
+
+  /* Empty state */
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--muted);
+    animation: fadeUp .4s ease both;
+  }
+  .empty-state p { margin-bottom: 1.25rem; }
+  .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="dash-header">
+  <h1>📊 Dashboard</h1>
+  <p>All quiz attempts — most recent first.</p>
+</div>
+
+{% if results %}
+  <!-- Summary stats -->
+  {% set avg_pct = (results | map(attribute='percentage') | map('int') | list | sum / results | length) | round | int %}
+  {% set best    = results | map(attribute='percentage') | map('int') | list | max %}
+
+  <div class="summary-row">
+    <div class="sum-card">
+      <div class="num">{{ results | length }}</div>
+      <div class="lbl">Total Attempts</div>
+    </div>
+    <div class="sum-card">
+      <div class="num">{{ avg_pct }}%</div>
+      <div class="lbl">Average Score</div>
+    </div>
+    <div class="sum-card">
+      <div class="num">{{ best }}%</div>
+      <div class="lbl">Best Score</div>
+    </div>
+    <div class="sum-card">
+      <div class="num">{{ results | map(attribute='username') | list | unique | list | length }}</div>
+      <div class="lbl">Unique Users</div>
+    </div>
+  </div>
+
+  <!-- Results table -->
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>User</th>
+          <th>Quiz</th>
+          <th>Score</th>
+          <th>Percentage</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in results %}
+        {% set pct = r.percentage | int %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td>{{ r.username }}</td>
+          <td>{{ r.quiz_title }}</td>
+          <td>{{ r.score }} / {{ r.total }}</td>
+          <td>
+            <span class="pct-cell
+              {% if pct >= 70 %}pct-high
+              {% elif pct >= 50 %}pct-mid
+              {% else %}pct-low{% endif %}">
+              {{ pct }}%
+            </span>
+            <div class="prog-bar-wrap">
+              <div class="prog-bar" style="width: {{ pct }}%;
+                background: {% if pct >= 70 %}var(--green){% elif pct >= 50 %}var(--yellow){% else %}var(--red){% endif %};"></div>
+            </div>
+          </td>
+          <td style="color: var(--muted)">{{ r.date }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+{% else %}
+  <div class="empty-state card">
+    <div class="empty-icon">📭</div>
+    <p>No attempts recorded yet.</p>
+    <a href="{{ url_for('index') }}" class="btn btn-primary">Take a Quiz →</a>
+  </div>
+{% endif %}
+
+{% endblock %}

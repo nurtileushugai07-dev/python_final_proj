@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}Home — Quiz Platform{% endblock %}
+
+{% block extra_head %}
+<style>
+  .hero {
+    text-align: center;
+    padding: 2.5rem 0 2rem;
+  }
+  .hero h1 {
+    font-size: 2.6rem;
+    line-height: 1.2;
+    margin-bottom: .75rem;
+  }
+  .hero h1 em {
+    font-style: normal;
+    color: var(--accent);
+  }
+  .hero p {
+    color: var(--muted);
+    font-size: 1.05rem;
+    max-width: 480px;
+    margin: 0 auto 1.5rem;
+  }
+  .stats-row {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+  }
+  .stat { text-align: center; }
+  .stat-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.8rem;
+    color: var(--accent);
+  }
+  .stat-label { font-size: .8rem; color: var(--muted); margin-top: .1rem; }
+
+  .section-title {
+    font-size: 1.2rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    font-size: .8rem;
+    margin-bottom: 1rem;
+  }
+  .quiz-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.25rem;
+  }
+  .quiz-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: .85rem;
+    transition: border-color .2s, transform .2s;
+    animation: fadeUp .4s ease both;
+  }
+  .quiz-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-3px);
+  }
+  .quiz-card:nth-child(2) { animation-delay: .08s; }
+  .quiz-card:nth-child(3) { animation-delay: .16s; }
+
+  .quiz-icon { font-size: 2.2rem; }
+  .quiz-card h3 { font-size: 1.15rem; }
+  .quiz-card p  { color: var(--muted); font-size: .9rem; flex: 1; }
+  .quiz-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .quiz-count { font-size: .82rem; color: var(--muted); }
+
+  .empty {
+    text-align: center;
+    color: var(--muted);
+    padding: 3rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<div class="hero fade-up">
+  <h1>Test Your <em>Knowledge</em>,<br>Track Your Progress</h1>
+  <p>Choose a quiz below, answer the questions, and see how you score.</p>
+  <a href="{{ url_for('dashboard') }}" class="btn btn-outline">📊 View Leaderboard</a>
+</div>
+
+<!-- Stats row -->
+<div class="stats-row">
+  <div class="stat">
+    <div class="stat-num">{{ quizzes | length }}</div>
+    <div class="stat-label">Available Quizzes</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">
+      {{ quizzes | map(attribute='questions') | map('length') | sum }}
+      {# simpler: count total questions #}
+      {% set ns = namespace(total=0) %}
+      {% for q in quizzes %}{% set ns.total = ns.total + q.questions|length %}{% endfor %}
+      {{ ns.total }}
+    </div>
+    <div class="stat-label">Total Questions</div>
+  </div>
+</div>
+
+<!-- Quiz cards -->
+<p class="section-title">Available Quizzes</p>
+
+{% if quizzes %}
+  <div class="quiz-grid">
+    {% for quiz in quizzes %}
+    <div class="quiz-card">
+      <div class="quiz-icon">{{ quiz.icon }}</div>
+      <h3>{{ quiz.title }}</h3>
+      <p>{{ quiz.description }}</p>
+      <div class="quiz-meta">
+        <span class="quiz-count">{{ quiz.questions | length }} questions</span>
+        <a href="{{ url_for('quiz', quiz_id=quiz.id) }}" class="btn btn-primary">
+          Start →
+        </a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty card">
+    <p>⚠️ No quizzes found. Make sure <code>data/questions.json</code> exists.</p>
+  </div>
+{% endif %}
+{% endblock %}
