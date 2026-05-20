@@ -267,5 +267,114 @@ def dashboard():
 
     return render_template("dashboard.html", results=history, leaderboard=leaderboard)
 
+@app.route("/admin")
+def admin():
+    quizzes = manager.load_all_quizzes()
+    return render_template("admin.html", quizzes=quizzes)
+
+
+@app.route("/admin/save", methods=["POST"])
+def admin_save():
+    try:
+        title          = request.form.get("title", "").strip()
+        description    = request.form.get("description", "").strip()
+        icon           = request.form.get("icon", "📝").strip() or "📝"
+        category       = request.form.get("category", "General").strip()
+        timer_minutes  = int(request.form.get("timer_minutes", 5))
+
+        if not title:
+            return redirect(url_for("admin"))
+
+        quiz_id = title.lower().replace(" ", "_").replace("-", "_")
+        # Make sure it's unique by appending a number if needed
+        existing_ids = [q["id"] for q in manager.load_all_quizzes()]
+        base_id, counter = quiz_id, 2
+        while quiz_id in existing_ids:
+            quiz_id = f"{base_id}_{counter}"
+            counter += 1
+
+        questions = []
+        q_index = 1
+        while True:
+            q_type = request.form.get(f"q_type_{q_index}")
+            q_text = request.form.get(f"q_text_{q_index}", "").strip()
+            if not q_type or not q_text:
+                break   # no more questions
+
+            correct = request.form.get(f"q_correct_{q_index}", "").strip()
+
+            if q_type == "true_false":
+                questions.append({
+                    "id"            : q_index,
+                    "type"          : "true_false",
+                    "text"          : q_text,
+                    "correct_answer": correct if correct in ("True", "False") else "True"
+                })
+            else:   # multiple_choice
+                options = []
+                for opt_i in range(1, 5):
+                    opt = request.form.get(f"opt_{q_index}_{opt_i}", "").strip()
+                    if opt:
+                        options.append(opt)
+                if options and correct:
+                    questions.append({
+                        "id"            : q_index,
+                        "type"          : "multiple_choice",
+                        "text"          : q_text,
+                        "options"       : options,
+                        "correct_answer": correct
+                    })
+
+            q_index += 1
+
+        if not questions:
+            return redirect(url_for("admin"))
+
+        new_quiz = {
+            "id"            : quiz_id,
+            "title"         : title,
+            "description"   : description,
+            "icon"          : icon,
+            "category"      : category,
+            "timer_minutes" : timer_minutes,
+            "questions"     : questions
+        }
+
+        try:
+            with open(QUESTIONS_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            data = {"quizzes": []}
+
+        data["quizzes"].append(new_quiz)
+
+        with open(QUESTIONS_FILE, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+
+    except Exception as e:
+        print(f"[admin_save] ERROR: {e}")
+
+    return redirect(url_for("admin"))
+
+
+@app.route("/admin/delete/<quiz_id>", methods=["POST"])
+def admin_delete(quiz_id):
+    try:
+        with open(QUESTIONS_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        data["quizzes"] = [q for q in data["quizzes"] if q["id"] != quiz_id]
+
+        with open(QUESTIONS_FILE, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        print(f"[admin_delete] ERROR: {e}")
+
+    return redirect(url_for("admin"))
+
+
 if __name__ == "__main__":
     app.run(debug=True)
+
+
