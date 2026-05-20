@@ -2,16 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ae39abae-3ebf-40be-921b-9765c55cb356" name="Changes" comment=".">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/questions.json" beforeDir="false" afterPath="$PROJECT_DIR$/data/questions.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/results.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/results.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/base.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/dashboard.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/quiz.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/quiz.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/result.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/result.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/test_quiz.py" beforeDir="false" afterPath="$PROJECT_DIR$/test/test_quiz.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

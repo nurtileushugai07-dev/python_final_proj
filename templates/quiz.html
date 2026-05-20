@@ -8,7 +8,6 @@
   .quiz-header h1 { font-size:2rem; margin-bottom:.4rem; }
   .quiz-header p  { color:var(--muted); }
 
-  /* ── Timer bar ── */
   .timer-bar {
     position: sticky; top: 57px; z-index: 90;
     background: var(--surface); border: 1px solid var(--border);
@@ -74,13 +73,11 @@
     <div class="timer-label">⏱ Time remaining</div>
   </div>
 
-  <!-- Username -->
   <div class="name-card">
     <label for="username">👤 Your name:</label>
     <input type="text" id="username" name="username" placeholder="Enter your name…" required maxlength="50" />
   </div>
 
-  <!-- Questions -->
   {% for q in questions %}
   <div class="question-card" style="animation-delay:{{ loop.index * 0.06 }}s">
     <div class="q-number">
@@ -117,7 +114,6 @@
   </div>
 </form>
 
-<!-- ── Timer script ── -->
 <script>
   (function() {
     var total   = {{ total_secs }};
@@ -136,12 +132,10 @@
       display.textContent = fmt(remain);
       bar.style.width = (remain / total * 100) + '%';
 
-      // Colour warnings
       display.classList.remove('warning', 'danger');
       if (remain <= 60)       display.classList.add('danger');
       else if (remain <= 180) display.classList.add('warning');
 
-      // Change bar colour
       if (remain <= 60)       bar.style.background = 'var(--red)';
       else if (remain <= 180) bar.style.background = 'var(--yellow)';
 

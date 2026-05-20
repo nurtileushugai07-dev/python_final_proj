@@ -44,6 +44,51 @@
         {"id": 4, "type": "true_false", "text": "A Queue uses FIFO (First In, First Out) ordering.", "correct_answer": "True"},
         {"id": 5, "type": "multiple_choice", "text": "Which sorting algorithm has average time complexity O(n log n)?", "options": ["Bubble Sort", "Insertion Sort", "Merge Sort", "Selection Sort"], "correct_answer": "Merge Sort"}
       ]
+    },
+    {
+      "id": "sql_fundamentals",
+      "title": "SQL Fundamentals",
+      "description": "Test your knowledge of database queries and concepts",
+      "icon": "🗄️",
+      "category": "Database",
+      "timer_minutes": 5,
+      "questions": [
+        {"id": 1, "type": "multiple_choice", "text": "Which SQL statement is used to extract data from a database?", "options": ["EXTRACT", "SELECT", "GET", "OPEN"], "correct_answer": "SELECT"},
+        {"id": 2, "type": "true_false", "text": "PRIMARY KEY constraints can contain NULL values.", "correct_answer": "False"},
+        {"id": 3, "type": "multiple_choice", "text": "Which keyword is used to sort the result-set in SQL?", "options": ["SORT BY", "ORDER BY", "GROUP BY", "ALIGN BY"], "correct_answer": "ORDER BY"},
+        {"id": 4, "type": "true_false", "text": "The JOIN clause is used to combine rows from two or more tables based on a related column.", "correct_answer": "True"},
+        {"id": 5, "type": "multiple_choice", "text": "What does the COUNT() function do?", "options": ["Calculates the sum of a column", "Returns the average value", "Returns the number of rows that match a specified criterion", "Finds the maximum value"], "correct_answer": "Returns the number of rows that match a specified criterion"}
+      ]
+    },
+    {
+      "id": "java_basics",
+      "title": "Java Basics",
+      "description": "Core Java concepts and Object-Oriented Programming",
+      "icon": "☕",
+      "category": "Programming",
+      "timer_minutes": 5,
+      "questions": [
+        {"id": 1, "type": "multiple_choice", "text": "Which of the following is NOT a primitive data type in Java?", "options": ["int", "boolean", "String", "double"], "correct_answer": "String"},
+        {"id": 2, "type": "true_false", "text": "In Java, a class can inherit from multiple abstract classes simultaneously.", "correct_answer": "False"},
+        {"id": 3, "type": "multiple_choice", "text": "Which keyword is used to create a new object in Java?", "options": ["create", "new", "init", "object"], "correct_answer": "new"},
+        {"id": 4, "type": "true_false", "text": "The main method in a Java program must be declared as static.", "correct_answer": "True"},
+        {"id": 5, "type": "multiple_choice", "text": "Which interface in the Java Collections Framework does NOT allow duplicate elements?", "options": ["List", "Queue", "Set", "Map"], "correct_answer": "Set"}
+      ]
+    },
+    {
+      "id": "backend_apis",
+      "title": "Backend & APIs",
+      "description": "Test your understanding of REST, HTTP, and backend architecture",
+      "icon": "⚙️",
+      "category": "Backend",
+      "timer_minutes": 5,
+      "questions": [
+        {"id": 1, "type": "multiple_choice", "text": "Which HTTP method is conventionally used to create a new resource on the server?", "options": ["GET", "PUT", "POST", "DELETE"], "correct_answer": "POST"},
+        {"id": 2, "type": "true_false", "text": "REST is a strict protocol that defines exact coding rules for APIs.", "correct_answer": "False"},
+        {"id": 3, "type": "multiple_choice", "text": "What does JSON stand for?", "options": ["JavaScript Object Notation", "Java Standard Output Network", "JavaScript Oriented Notation", "Java Serialized Object Network"], "correct_answer": "JavaScript Object Notation"},
+        {"id": 4, "type": "true_false", "text": "An HTTP status code of 201 indicates that a resource has been successfully created.", "correct_answer": "True"},
+        {"id": 5, "type": "multiple_choice", "text": "What is the primary purpose of an API (Application Programming Interface)?", "options": ["To style web pages", "To store data permanently", "To allow different software applications to communicate", "To compile source code"], "correct_answer": "To allow different software applications to communicate"}
+      ]
     }
   ]
 }

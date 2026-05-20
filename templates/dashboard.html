@@ -7,7 +7,6 @@
   .dash-header h1 { font-size:2rem; margin-bottom:.35rem; }
   .dash-header p  { color:var(--muted); }
 
-  /* ── Leaderboard ── */
   .leaderboard-section { margin-bottom:2.5rem; animation:fadeUp .35s ease .05s both; }
   .section-label { font-size:.8rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); margin-bottom:.9rem; }
 
@@ -41,13 +40,11 @@
   .pct-mid  { color:var(--yellow); }
   .pct-low  { color:var(--red); }
 
-  /* ── Summary cards ── */
   .summary-row { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:1rem; margin-bottom:2rem; animation:fadeUp .35s ease .1s both; }
   .sum-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.1rem; text-align:center; }
   .sum-card .num { font-family:'DM Serif Display',serif; font-size:1.7rem; color:var(--accent); }
   .sum-card .lbl { font-size:.78rem; color:var(--muted); margin-top:.1rem; }
 
-  /* ── History table ── */
   .table-wrap { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; animation:fadeUp .4s ease .15s both; }
   table { width:100%; border-collapse:collapse; font-size:.92rem; }
   thead tr { background:rgba(108,99,255,.12); border-bottom:1px solid var(--border); }
@@ -70,7 +67,6 @@
 </div>
 
 {% if leaderboard %}
-<!-- ── TOP-5 LEADERBOARD ── -->
 <div class="leaderboard-section">
   <div class="section-label">🏆 Top 5 Leaderboard</div>
   <div class="leaderboard-list">
