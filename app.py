@@ -9,15 +9,13 @@ BASE_DIR       = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR       = os.path.join(BASE_DIR, "data")
 QUESTIONS_FILE = os.path.join(DATA_DIR, "questions.json")
 RESULTS_FILE   = os.path.join(DATA_DIR, "results.csv")
-CSV_HEADERS    = ["username", "quiz_id", "quiz_title",
-                  "score", "total", "percentage", "date"]
+CSV_HEADERS    = ["username", "quiz_id", "quiz_title", "score", "total", "percentage", "date"]
 
 app = Flask(__name__)
-app.secret_key = "quiz_platform_secret_key_2024"  # Needed for session
+app.secret_key = "quiz_platform_secret_key_2024"
 
 
 class Question(ABC):
-
     def __init__(self, question_id: int, text: str, correct_answer: str):
         self.id             = question_id
         self.text           = text
@@ -36,9 +34,7 @@ class Question(ABC):
 
 
 class MultipleChoiceQuestion(Question):
-
-    def __init__(self, question_id: int, text: str,
-                 options: list, correct_answer: str):
+    def __init__(self, question_id: int, text: str, options: list, correct_answer: str):
         super().__init__(question_id, text, correct_answer)
         self.options = options
 
@@ -50,14 +46,12 @@ class MultipleChoiceQuestion(Question):
 
 
 class TrueFalseQuestion(Question):
-
-    TRUTHY  = {"true",  "yes", "1", "t", "y"}
-    FALSY   = {"false", "no",  "0", "f", "n"}
+    TRUTHY = {"true", "yes", "1", "t", "y"}
+    FALSY  = {"false", "no", "0", "f", "n"}
 
     def check_answer(self, user_answer: str) -> bool:
         user_norm    = user_answer.strip().lower()
         correct_norm = self.correct_answer.strip().lower()
-
         user_bool    = user_norm    in self.TRUTHY
         correct_bool = correct_norm in self.TRUTHY
         return user_bool == correct_bool
@@ -67,7 +61,6 @@ class TrueFalseQuestion(Question):
 
 
 class QuizManager:
-
     def __init__(self, questions_file: str):
         self.questions_file = questions_file
 
@@ -109,39 +102,38 @@ class QuizManager:
             objects.append(obj)
         return objects
 
-    def calculate_score(self, quiz_data: dict,
-                        user_answers: dict) -> dict:
+    def calculate_score(self, quiz_data: dict, user_answers: dict) -> dict:
         questions   = self.build_questions(quiz_data)
         results     = []
         correct_cnt = 0
 
         for q in questions:
-            key         = f"q_{q.id}"
-            user_ans    = user_answers.get(key, "").strip()
-            is_correct  = q.check_answer(user_ans) if user_ans else False
+            key        = f"q_{q.id}"
+            user_ans   = user_answers.get(key, "").strip()
+            is_correct = q.check_answer(user_ans) if user_ans else False
 
             if is_correct:
                 correct_cnt += 1
 
             results.append({
-                "id"             : q.id,
-                "text"           : q.text,
-                "type"           : q.get_type(),
-                "user_answer"    : user_ans if user_ans else "(no answer)",
-                "correct_answer" : q.correct_answer,
-                "is_correct"     : is_correct,
-                "options"        : getattr(q, "options", [])
+                "id"            : q.id,
+                "text"          : q.text,
+                "type"          : q.get_type(),
+                "user_answer"   : user_ans if user_ans else "(no answer)",
+                "correct_answer": q.correct_answer,
+                "is_correct"    : is_correct,
+                "options"       : getattr(q, "options", [])
             })
 
         total      = len(questions)
         percentage = round((correct_cnt / total) * 100) if total else 0
 
         return {
-            "score"      : correct_cnt,
-            "total"      : total,
-            "percentage" : percentage,
-            "results"    : results,
-            "grade"      : self._grade(percentage)
+            "score"     : correct_cnt,
+            "total"     : total,
+            "percentage": percentage,
+            "results"   : results,
+            "grade"     : self._grade(percentage)
         }
 
     @staticmethod
@@ -152,9 +144,9 @@ class QuizManager:
         if percentage >= 60: return "D"
         return "F"
 
-def save_result_to_csv(username: str, quiz_id: str,
-                       quiz_title: str, score: int,
-                       total: int, percentage: int) -> None:
+
+def save_result_to_csv(username: str, quiz_id: str, quiz_title: str,
+                       score: int, total: int, percentage: int) -> None:
     try:
         os.makedirs(DATA_DIR, exist_ok=True)
         file_exists = os.path.isfile(RESULTS_FILE)
@@ -189,6 +181,7 @@ def load_results_from_csv() -> list:
     except csv.Error as e:
         print(f"[load_results] ERROR: Corrupt CSV — {e}")
         return []
+
 
 manager = QuizManager(QUESTIONS_FILE)
 
@@ -229,10 +222,9 @@ def result():
     flat_answers = {k: (v[0] if isinstance(v, list) else v)
                     for k, v in user_answers.items()}
 
-    username = flat_answers.pop("username", "Anonymous")
+    username   = flat_answers.pop("username", "Anonymous")
     score_data = manager.calculate_score(quiz_data, flat_answers)
 
-    # Persist to CSV
     save_result_to_csv(
         username   = username,
         quiz_id    = quiz_id,
@@ -242,7 +234,6 @@ def result():
         percentage = score_data["percentage"]
     )
 
-    # Clear session after use
     session.pop("user_answers", None)
     session.pop("quiz_id", None)
 
@@ -252,6 +243,7 @@ def result():
         username   = username,
         score_data = score_data
     )
+
 
 @app.route("/dashboard")
 def dashboard():
@@ -264,8 +256,8 @@ def dashboard():
     )[:5]
 
     history = list(reversed(all_results))
-
     return render_template("dashboard.html", results=history, leaderboard=leaderboard)
+
 
 @app.route("/admin")
 def admin():
@@ -276,17 +268,16 @@ def admin():
 @app.route("/admin/save", methods=["POST"])
 def admin_save():
     try:
-        title          = request.form.get("title", "").strip()
-        description    = request.form.get("description", "").strip()
-        icon           = request.form.get("icon", "📝").strip() or "📝"
-        category       = request.form.get("category", "General").strip()
-        timer_minutes  = int(request.form.get("timer_minutes", 5))
+        title         = request.form.get("title", "").strip()
+        description   = request.form.get("description", "").strip()
+        icon          = request.form.get("icon", "📝").strip() or "📝"
+        category      = request.form.get("category", "General").strip()
+        timer_minutes = int(request.form.get("timer_minutes", 5))
 
         if not title:
             return redirect(url_for("admin"))
 
         quiz_id = title.lower().replace(" ", "_").replace("-", "_")
-        # Make sure it's unique by appending a number if needed
         existing_ids = [q["id"] for q in manager.load_all_quizzes()]
         base_id, counter = quiz_id, 2
         while quiz_id in existing_ids:
@@ -299,7 +290,7 @@ def admin_save():
             q_type = request.form.get(f"q_type_{q_index}")
             q_text = request.form.get(f"q_text_{q_index}", "").strip()
             if not q_type or not q_text:
-                break   # no more questions
+                break
 
             correct = request.form.get(f"q_correct_{q_index}", "").strip()
 
@@ -310,7 +301,7 @@ def admin_save():
                     "text"          : q_text,
                     "correct_answer": correct if correct in ("True", "False") else "True"
                 })
-            else:   # multiple_choice
+            else:
                 options = []
                 for opt_i in range(1, 5):
                     opt = request.form.get(f"opt_{q_index}_{opt_i}", "").strip()
@@ -331,13 +322,13 @@ def admin_save():
             return redirect(url_for("admin"))
 
         new_quiz = {
-            "id"            : quiz_id,
-            "title"         : title,
-            "description"   : description,
-            "icon"          : icon,
-            "category"      : category,
-            "timer_minutes" : timer_minutes,
-            "questions"     : questions
+            "id"           : quiz_id,
+            "title"        : title,
+            "description"  : description,
+            "icon"         : icon,
+            "category"     : category,
+            "timer_minutes": timer_minutes,
+            "questions"    : questions
         }
 
         try:
@@ -376,5 +367,3 @@ def admin_delete(quiz_id):
 
 if __name__ == "__main__":
     app.run(debug=True)
-
-

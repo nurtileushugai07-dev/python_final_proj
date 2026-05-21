@@ -138,6 +138,7 @@
   {% block extra_head %}{% endblock %}
 </head>
 <body>
+
   <nav>
     <a href="{{ url_for('index') }}" class="nav-brand">
       🧠 <span>Quiz</span>Platform
@@ -145,6 +146,7 @@
     <div class="nav-links">
       <a href="{{ url_for('index') }}"     {% if request.endpoint == 'index'     %}class="active"{% endif %}>Home</a>
       <a href="{{ url_for('dashboard') }}" {% if request.endpoint == 'dashboard' %}class="active"{% endif %}>Dashboard</a>
+      <a href="{{ url_for('admin') }}"     {% if request.endpoint in ('admin','admin_save','admin_delete') %}class="active"{% endif %} style="color:var(--yellow)">⚙️ Admin</a>
     </div>
   </nav>
   <main>

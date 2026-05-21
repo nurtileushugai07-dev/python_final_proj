@@ -1,0 +1,339 @@
+{% extends "base.html" %}
+{% block title %}Admin Panel — Quiz Platform{% endblock %}
+
+{% block extra_head %}
+<style>
+  .admin-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+  @media(max-width:720px){ .admin-grid { grid-template-columns:1fr; } }
+
+  .panel-title {
+    font-size: .78rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .1em; color: var(--muted); margin-bottom: 1rem;
+  }
+
+  .quiz-list-panel { position: sticky; top: 70px; }
+  .quiz-item {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1rem 1.1rem;
+    margin-bottom: .7rem; display: flex; align-items: center; gap: .85rem;
+    animation: fadeUp .35s ease both;
+  }
+  .quiz-item:hover { border-color: rgba(108,99,255,.4); }
+  .qi-icon  { font-size: 1.6rem; flex-shrink:0; }
+  .qi-info  { flex: 1; min-width: 0; }
+  .qi-title { font-weight: 600; font-size: .95rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .qi-meta  { font-size: .78rem; color: var(--muted); margin-top:.15rem; }
+  .qi-del   {
+    background: rgba(255,107,107,.12); border: 1px solid rgba(255,107,107,.3);
+    color: var(--red); border-radius: 7px; padding: .3rem .65rem;
+    font-size: .8rem; font-weight: 600; cursor: pointer;
+    transition: background .15s; flex-shrink:0;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .qi-del:hover { background: rgba(255,107,107,.25); }
+
+  .empty-list { text-align:center; color:var(--muted); padding:2rem; font-size:.9rem; }
+  .form-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.5rem;
+    animation: fadeUp .4s ease .05s both;
+  }
+  .form-card h2 { font-size: 1.2rem; margin-bottom: 1.25rem; }
+
+  .field-group { margin-bottom: 1.1rem; }
+  .field-group label {
+    display: block; font-size: .82rem; font-weight: 600;
+    color: var(--muted); text-transform: uppercase; letter-spacing:.06em;
+    margin-bottom: .4rem;
+  }
+  .field-group input,
+  .field-group select,
+  .field-group textarea {
+    width: 100%; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: .6rem .9rem; color: var(--text);
+    font-family: 'DM Sans', sans-serif; font-size: .95rem;
+    outline: none; transition: border-color .2s; box-sizing: border-box;
+  }
+  .field-group input:focus,
+  .field-group select:focus,
+  .field-group textarea:focus { border-color: var(--accent); }
+  .field-group textarea { resize: vertical; min-height: 60px; }
+  .field-group select option { background: var(--surface); }
+
+  .meta-row { display: grid; grid-template-columns: 1fr 1fr 80px; gap: .75rem; }
+  @media(max-width:500px){ .meta-row { grid-template-columns:1fr; } }
+
+  .q-section-title {
+    font-size: .82rem; font-weight: 700; color: var(--accent);
+    text-transform: uppercase; letter-spacing: .08em;
+    margin: 1.5rem 0 .75rem; display: flex; align-items:center; gap:.5rem;
+  }
+  .q-counter {
+    background: var(--accent); color: #fff;
+    border-radius: 999px; width:20px; height:20px;
+    display:inline-flex; align-items:center; justify-content:center;
+    font-size:.72rem; font-weight:700;
+  }
+
+  .question-block {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1rem; margin-bottom: .85rem;
+    position: relative;
+  }
+  .question-block .q-num {
+    font-size: .72rem; font-weight:700; color: var(--muted);
+    text-transform: uppercase; letter-spacing:.06em; margin-bottom:.6rem;
+  }
+  .q-type-select {
+    width:100%; background:var(--bg); border:1px solid var(--border);
+    border-radius:8px; padding:.5rem .8rem; color:var(--text);
+    font-family:'DM Sans',sans-serif; font-size:.9rem; outline:none;
+    margin-bottom:.7rem; cursor:pointer;
+  }
+  .q-text-input {
+    width:100%; background:var(--bg); border:1px solid var(--border);
+    border-radius:8px; padding:.55rem .85rem; color:var(--text);
+    font-family:'DM Sans',sans-serif; font-size:.9rem; outline:none;
+    margin-bottom:.7rem; box-sizing:border-box;
+  }
+  .q-text-input:focus { border-color:var(--accent); }
+
+  .mc-options { display:flex; flex-direction:column; gap:.45rem; margin-bottom:.7rem; }
+  .mc-opt-row { display:flex; gap:.5rem; align-items:center; }
+  .mc-opt-row input[type="text"] {
+    flex:1; background:var(--bg); border:1px solid var(--border);
+    border-radius:8px; padding:.45rem .75rem; color:var(--text);
+    font-family:'DM Sans',sans-serif; font-size:.88rem; outline:none;
+  }
+  .mc-opt-row input[type="text"]:focus { border-color:var(--accent); }
+  .opt-label { font-size:.75rem; color:var(--muted); width:18px; text-align:center; flex-shrink:0; }
+
+  .correct-row { display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; }
+  .correct-row label { font-size:.78rem; color:var(--green); font-weight:600; white-space:nowrap; }
+  .correct-row input,
+  .correct-row select {
+    flex:1; min-width:120px; background:var(--bg);
+    border:1px solid rgba(67,217,162,.4); border-radius:8px;
+    padding:.45rem .75rem; color:var(--green);
+    font-family:'DM Sans',sans-serif; font-size:.88rem; outline:none;
+  }
+
+  .tf-correct select { color:var(--green); }
+  .remove-q {
+    position:absolute; top:.75rem; right:.75rem;
+    background:rgba(255,107,107,.1); border:1px solid rgba(255,107,107,.25);
+    color:var(--red); border-radius:6px; width:26px; height:26px;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; font-size:13px; transition:background .15s;
+    font-family:monospace;
+  }
+  .remove-q:hover { background:rgba(255,107,107,.25); }
+
+  .add-q-btn {
+    width:100%; padding:.65rem; border:1px dashed rgba(108,99,255,.5);
+    background:rgba(108,99,255,.06); border-radius:8px;
+    color:var(--accent); font-weight:600; font-size:.9rem;
+    cursor:pointer; transition:background .15s;
+    font-family:'DM Sans',sans-serif; margin-top:.25rem;
+  }
+  .add-q-btn:hover { background:rgba(108,99,255,.14); }
+
+  .save-btn { width:100%; margin-top:1.25rem; padding:.75rem; font-size:1rem; }
+
+  .flash { background:rgba(67,217,162,.12); border:1px solid rgba(67,217,162,.3);
+    color:var(--green); border-radius:var(--radius); padding:.75rem 1rem;
+    margin-bottom:1rem; font-size:.9rem; font-weight:500; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="margin-bottom:1.5rem; animation:fadeUp .3s ease both;">
+  <h1 style="font-size:2rem; margin-bottom:.3rem;">⚙️ Admin Panel</h1>
+  <p style="color:var(--muted)">Create new quizzes and manage existing ones.</p>
+</div>
+
+<div class="admin-grid">
+
+  <div class="quiz-list-panel">
+    <div class="panel-title">📚 Existing Quizzes ({{ quizzes|length }})</div>
+
+    {% if quizzes %}
+      {% for q in quizzes %}
+      <div class="quiz-item" style="animation-delay:{{ loop.index * 0.05 }}s">
+        <div class="qi-icon">{{ q.icon }}</div>
+        <div class="qi-info">
+          <div class="qi-title">{{ q.title }}</div>
+          <div class="qi-meta">
+            {{ q.category }} &nbsp;·&nbsp; {{ q.questions|length }} questions &nbsp;·&nbsp; ⏱ {{ q.timer_minutes }}min
+          </div>
+        </div>
+        <form method="POST" action="{{ url_for('admin_delete', quiz_id=q.id) }}"
+              onsubmit="return confirm('Delete «{{ q.title }}»?')">
+          <button type="submit" class="qi-del">✕ Delete</button>
+        </form>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty-list">No quizzes yet. Create one →</div>
+    {% endif %}
+  </div>
+
+  <div>
+    <div class="panel-title">✏️ Create New Quiz</div>
+    <div class="form-card">
+      <form method="POST" action="{{ url_for('admin_save') }}" id="createForm">
+
+        <div class="field-group">
+          <label>Quiz Title *</label>
+          <input type="text" name="title" placeholder="e.g. History of Kazakhstan" required />
+        </div>
+
+        <div class="field-group">
+          <label>Description</label>
+          <textarea name="description" placeholder="Short description shown on the home page…"></textarea>
+        </div>
+
+        <div class="meta-row">
+          <div class="field-group" style="margin:0">
+            <label>Category</label>
+            <input type="text" name="category" placeholder="e.g. Science" list="cat-list" />
+            <datalist id="cat-list">
+              {% for q in quizzes %}
+                <option value="{{ q.category }}">
+              {% endfor %}
+            </datalist>
+          </div>
+          <div class="field-group" style="margin:0">
+            <label>Icon (emoji)</label>
+            <input type="text" name="icon" placeholder="📝" maxlength="4" />
+          </div>
+          <div class="field-group" style="margin:0">
+            <label>⏱ Min</label>
+            <input type="number" name="timer_minutes" value="5" min="1" max="60" />
+          </div>
+        </div>
+
+        <div class="q-section-title">
+          Questions <span class="q-counter" id="qCount">0</span>
+        </div>
+
+        <div id="questionsContainer"></div>
+
+        <button type="button" class="add-q-btn" onclick="addQuestion()">
+          + Add Question
+        </button>
+
+        <button type="submit" class="btn btn-primary save-btn">
+          💾 Save Quiz
+        </button>
+      </form>
+    </div>
+  </div>
+
+</div>
+
+<script>
+var qCount = 0;
+
+function addQuestion() {
+  qCount++;
+  document.getElementById('qCount').textContent = qCount;
+
+  var container = document.getElementById('questionsContainer');
+  var idx = qCount;
+
+  var div = document.createElement('div');
+  div.className = 'question-block';
+  div.id = 'qblock_' + idx;
+  div.innerHTML = `
+    <div class="q-num">Question ${idx}</div>
+    <button type="button" class="remove-q" onclick="removeQuestion(${idx}, this)" title="Remove">✕</button>
+
+    <select class="q-type-select" name="q_type_${idx}" id="qtype_${idx}"
+            onchange="onTypeChange(${idx})">
+      <option value="multiple_choice">Multiple Choice</option>
+      <option value="true_false">True / False</option>
+    </select>
+
+    <input class="q-text-input" type="text" name="q_text_${idx}"
+           placeholder="Enter question text…" required />
+
+    <div id="mc_${idx}" class="mc-options">
+      <div class="mc-opt-row"><span class="opt-label">A</span><input type="text" name="opt_${idx}_1" placeholder="Option A" /></div>
+      <div class="mc-opt-row"><span class="opt-label">B</span><input type="text" name="opt_${idx}_2" placeholder="Option B" /></div>
+      <div class="mc-opt-row"><span class="opt-label">C</span><input type="text" name="opt_${idx}_3" placeholder="Option C" /></div>
+      <div class="mc-opt-row"><span class="opt-label">D</span><input type="text" name="opt_${idx}_4" placeholder="Option D" /></div>
+    </div>
+
+    <div class="correct-row" id="mc_correct_${idx}">
+      <label>✓ Correct answer:</label>
+      <input type="text" name="q_correct_${idx}"
+             placeholder="Paste exact text of the correct option" />
+    </div>
+
+    <div class="correct-row" id="tf_correct_${idx}" style="display:none">
+      <label>✓ Correct answer:</label>
+      <select name="q_correct_tf_${idx}" class="tf-correct">
+        <option value="True">True</option>
+        <option value="False">False</option>
+      </select>
+    </div>
+  `;
+
+  container.appendChild(div);
+}
+
+function onTypeChange(idx) {
+  var type = document.getElementById('qtype_' + idx).value;
+  var mcDiv        = document.getElementById('mc_' + idx);
+  var mcCorrect    = document.getElementById('mc_correct_' + idx);
+  var tfCorrect    = document.getElementById('tf_correct_' + idx);
+
+  if (type === 'true_false') {
+    mcDiv.style.display     = 'none';
+    mcCorrect.style.display = 'none';
+    tfCorrect.style.display = 'flex';
+    // Sync TF select → hidden correct input so the backend reads it
+    syncTF(idx);
+  } else {
+    mcDiv.style.display     = 'flex';
+    mcCorrect.style.display = 'flex';
+    tfCorrect.style.display = 'none';
+  }
+}
+
+function syncTF(idx) {
+}
+
+function removeQuestion(idx, btn) {
+  var block = document.getElementById('qblock_' + idx);
+  if (block) block.remove();
+  var blocks = document.querySelectorAll('.question-block');
+  qCount = blocks.length;
+  document.getElementById('qCount').textContent = qCount;
+  blocks.forEach(function(b, i) {
+    b.querySelector('.q-num').textContent = 'Question ' + (i + 1);
+  });
+}
+
+document.getElementById('createForm').addEventListener('submit', function() {
+  document.querySelectorAll('.question-block').forEach(function(block) {
+    var idx = block.id.replace('qblock_', '');
+    var typeEl = document.getElementById('qtype_' + idx);
+    if (!typeEl) return;
+    if (typeEl.value === 'true_false') {
+      var tfSel = block.querySelector('[name="q_correct_tf_' + idx + '"]');
+      var hidden = block.querySelector('[name="q_correct_' + idx + '"]');
+      if (tfSel && hidden) hidden.value = tfSel.value;
+    }
+  });
+});
+
+addQuestion();
+</script>
+{% endblock %}
