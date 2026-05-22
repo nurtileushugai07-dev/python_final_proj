@@ -26,7 +26,7 @@ Quiz & Test Prep Platform is a multi-page web application that allows users to t
 
 ---
 
-## 🏗 Technologies Used
+## Technologies Used
 
 | Technology | Purpose |
 |---|---|
