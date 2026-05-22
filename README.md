@@ -15,14 +15,18 @@ Quiz & Test Prep Platform is a multi-page web application that allows users to t
 -  **Multiple quizzes** on different topics (Python Basics, Web Development, Data Structures)
 -  **Two question types**: Multiple Choice and True/False
 -  **Instant results** with a per-question answer review
--  **Dashboard** — full history of all attempts loaded from CSV
+-  **Dashboard** - full history of all attempts loaded from CSV
+-  **Top-5 Leaderboard** - sorted by score using Python's built-in `sorted()`
+-  **Exam timer** - countdown per quiz, auto-submits when time runs out
+-  **Category filter** - quizzes grouped and filtered by topic on the home page
+-  **Admin Panel** - create new quizzes and delete existing ones directly from the browser
 -  **File-based persistence** - questions in JSON, results in CSV
 -  **Robust error handling** - app never crashes on missing/corrupt files
 -  **Clean OOP architecture** - abstract base class + polymorphism
 
 ---
 
-##  Technologies Used
+## 🏗 Technologies Used
 
 | Technology | Purpose |
 |---|---|
@@ -51,24 +55,25 @@ quiz_platform/
 ├── templates/
 │   ├── base.html           # Base template (Jinja2 blocks)
 │   ├── index.html          # / - Home page, quiz catalogue
-│   ├── quiz.html           # /quiz/<id> - Question form
-│   ├── result.html         # /result - Score + answer review
-│   ├── dashboard.html      # /dashboard - Attempt history
+│   ├── quiz.html           # /quiz/<id> - Question form + timer
+│   ├── result.html         # /result - Score + detailed answer review
+│   ├── dashboard.html      # /dashboard - Leaderboard + attempt history
+│   ├── admin.html          # /admin - Admin panel (create/delete quizzes)
 │   └── 404.html            # Error page
 │
 └── tests/
-    └── test_quiz.py        # 20 unit tests (unittest)
+    └── test_quiz.py        # 8 unit tests (unittest)
 ```
 
 ---
 
-## Installation
+##  Installation
 
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/<your-username>/quiz-platform.git
-cd quiz-platform
+git clone https://github.com/nurtileushugai07-dev/python_final_proj
+cd python_final_proj
 ```
 
 ### 2. Create and activate a virtual environment
@@ -104,28 +109,32 @@ Then open your browser and go to: **http://127.0.0.1:5000**
 ##  Running Tests
 
 ```bash
-python tests/test_quiz.py -v
+python test/test_quiz.py -v
 ```
 
-Expected output: **20 tests, 0 failures.**
+Expected output: **8 tests, 0 failures.**
 
 ---
 
-##  Application Routes
+## 🗺 Application Routes
 
-| Route | Method | Description                                              |
-|---|---|----------------------------------------------------------|
-| `/` | GET | Home page - list of all available quizzes                |
-| `/quiz/<quiz_id>` | GET / POST | Quiz page - renders questions form; POST submits answers |
-| `/result` | GET | Result page - displays score and answer review           |
-| `/dashboard` | GET | Dashboard - full attempt history from CSV                |
+| Route | Method | Description                                          |
+|---|---|------------------------------------------------------|
+| `/` | GET | Home page - list of quizzes with category filter     |
+| `/quiz/<quiz_id>` | GET / POST | Quiz page - question form with countdown timer       |
+| `/result` | GET | Result page - score, grade, detailed answer review   |
+| `/dashboard` | GET | Dashboard - Top-5 leaderboard + full history from CSV |
+| `/admin` | GET | Admin panel- view all quizzes, create or delete      |
+| `/admin/save` | POST | Saves a new quiz to questions.json                   |
+| `/admin/delete/<id>` | POST | Deletes a quiz from questions.json                   |
 
 ---
 
 ## OOP Architecture
 
 ```
-Question (ABC - Abstract Base Class)
+Question (ABC -
+ Abstract Base Class)
 ├── MultipleChoiceQuestion
 │   └── check_answer() - case-insensitive exact match
 └── TrueFalseQuestion
@@ -140,6 +149,18 @@ QuizManager
 
 ---
 
+##  Adin Panel
+
+The Admin Panel at `/admin` allows you to manage quizzes directly from the browser without editing any files manually:
+
+- **View** all existing quizzes with question count and timer
+- **Create** a new quiz - fill in title, description, category, icon, timer, and add questions dynamically
+- **Choose** question type per question (Multiple Choice or True/False)
+- **Delete** any existing quiz with one click
+- All changes are saved instantly to `data/questions.json`
+
+---
+
 ##  Screenshots
 
 ![](screen/img.png)
@@ -148,15 +169,19 @@ QuizManager
 ![](screen/img_2.png)
 ![](screen/img_3.png)
 ---
+---
 
-##  Team Members
+## 👤 Team Members
 
-| Name               | Role |
-|--------------------|---|
-| *Shugay Nurtileu * | Full-stack development, OOP design, testing |
+| Name | Role |
+|---|---|
+| Shugay Nurtileu | Full-stack development, OOP design, testing |
 
 ---
 
-## License
+##  License
 
-This project was created for educational purposes at **Astana IT University**, Department of Software Engineering, ITP2 Final Project - 2024.
+This project was created for educational purposes at **Astana IT University**, Department of Software Engineering, ITP2 Final Project 2024.
+
+
+
