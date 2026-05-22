@@ -116,7 +116,7 @@ Expected output: **8 tests, 0 failures.**
 
 ---
 
-## 🗺 Application Routes
+##  Application Routes
 
 | Route | Method | Description                                          |
 |---|---|------------------------------------------------------|
@@ -171,7 +171,7 @@ The Admin Panel at `/admin` allows you to manage quizzes directly from the brows
 ---
 ---
 
-## 👤 Team Members
+##  Team Members
 
 | Name | Role |
 |---|---|
